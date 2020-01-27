@@ -1,4 +1,8 @@
-#!/usr/bin/sh
+#!/bin/sh
 
-venv_name=venv
-"$venv_name/bin/python" "scripts/main.py"
+DIR=$(cd $(dirname $0); pwd)
+cd $dirname
+
+VENV_NAME=venv
+
+$VENV_NAME/bin/python3 scripts/main.py

@@ -1,9 +1,16 @@
 #!/usr/bin/sh
 
-venv_name=venv
-if [ ! -e $venv_name ]; then
-  python3 -m venv $venv_name
-  . "$venv_name/bin/activate"
+DIR=$(cd $(dirname $0); pwd)
+cd $dirname
+
+VENV_NAME=venv
+
+if [ ! -d $VENV_NAME ]; then
+  echo "Start to setup"
+  python3 -m venv $VENV_NAME
+  . $VENV_NAME/bin/activate
   pip install -r requirements.txt
   deactivate
 fi
+
+echo "Completed"
