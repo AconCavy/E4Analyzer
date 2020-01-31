@@ -1,7 +1,7 @@
 #!/bin/sh
 
 DIR=$(cd $(dirname $0); pwd)
-cd $dirname
+cd $DIR
 
 VENV_NAME=venv
 
