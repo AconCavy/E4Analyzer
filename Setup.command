@@ -1,4 +1,4 @@
-#!/usr/bin/sh
+#!/bin/sh
 
 DIR=$(cd $(dirname $0); pwd)
 cd $dirname
