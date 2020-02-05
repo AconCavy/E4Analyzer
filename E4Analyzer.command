@@ -5,4 +5,4 @@ cd $DIR
 
 VENV_NAME=venv
 
-$VENV_NAME/bin/python3 scripts/main.py
+$VENV_NAME/bin/python3 -m e4analyzer

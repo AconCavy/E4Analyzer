@@ -71,7 +71,3 @@ def extract_zip(path):
             existing_zip.extractall(dir_path)
             return True
     return False
-
-
-if __name__ == '__main__':
-    main()

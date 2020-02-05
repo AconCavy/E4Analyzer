@@ -1,4 +1,4 @@
-if __name__ == '__main__':
-    from e4analyzer.cli import main
+from e4analyzer import main
 
+if __name__ == '__main__':
     main()
