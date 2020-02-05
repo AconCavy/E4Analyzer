@@ -11,7 +11,8 @@ class EmpaticaE4:
     def __init__(self, path):
         self._path = path
         self._bvp = np.loadtxt(self._path + '/BVP.csv', skiprows=2, delimiter=",", dtype=float)
-        self._hr = np.loadtxt(self._path + '/IBI.csv', skiprows=1, delimiter=",", dtype=float)
+        self._ibi = np.loadtxt(self._path + '/IBI.csv', skiprows=1, delimiter=",", dtype=float)
+        self._ibi[:, 1] *= 1000
         self._hr = np.loadtxt(self._path + '/HR.csv', skiprows=2, delimiter=",", dtype=float)
         self._eda = np.loadtxt(self._path + '/EDA.csv', skiprows=2, delimiter=",", dtype=float)
 
