@@ -17,6 +17,9 @@ Timer = pd.DataFrame(data={'Start': Start, 'End': End}, index=Conditions)
 
 def main():
     print(os.getcwd())
+    if not os.path.exists(ExportPath):
+        os.mkdir(ExportPath)
+
     paths = [x.replace('\\', '/') for x in glob.glob(ResourcesPath + '/*') if not ('.zip' in x)]
     zips = [x.replace('\\', '/') for x in glob.glob(ResourcesPath + '/*.zip')]
     zips = [x for x in zips if ([os.path.splitext(x)[0] in paths])]
