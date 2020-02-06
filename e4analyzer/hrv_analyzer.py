@@ -10,14 +10,12 @@ class HRVAnalyzer:
     HF_MIN = 0.15
     HF_MAX = 0.4
 
-    _bvp = np.empty([1, 0])
     _ibi = np.empty([2, 0])
     _hr = np.empty([1, 0])
     _frequency = np.empty([1, 0])
     _power = np.empty([1, 0])
 
-    def __init__(self, bvp, ibi, hr):
-        self._bvp = bvp
+    def __init__(self, ibi, hr):
         self._ibi = ibi
         self._hr = hr
         self._frequency, self._power = lombscargle.LombScargle(self._ibi[:, 0], self._ibi[:, 1],
