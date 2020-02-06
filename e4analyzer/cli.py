@@ -33,12 +33,6 @@ def main():
         data = pd.DataFrame(columns=Conditions)
         e4 = EmpaticaE4(path=path)
 
-        bvp = e4.get_bvp()
-        base_bvp = bvp[Timer['Start']['Base'] * 64:Timer['End']['Base'] * 64 - 1]
-        task1_bvp = bvp[Timer['Start']['Task 1'] * 64:Timer['End']['Task 1'] * 64 - 1]
-        bvp_length = (Timer['End']['Task 2'] * 64 if Timer['End']['Task 2'] * 64 < len(bvp) else len(bvp)) - 1
-        task2_bvp = bvp[Timer['Start']['Task 2']:bvp_length]
-
         ibi = e4.get_ibi()
         base_ibi = ibi[(Timer['Start']['Base'] <= ibi[:, 0]) & (ibi[:, 0] < Timer['End']['Base'])]
         base_ibi[:, 0] -= Timer['Start']['Base']
@@ -53,9 +47,9 @@ def main():
         hr_length = (Timer['End']['Task 2'] - 10 if Timer['End']['Task 2'] - 10 < len(hr) else len(hr)) - 1
         task2_hr = hr[Timer['Start']['Task 2']:hr_length]
 
-        base_hrv = HRVAnalyzer(bvp=base_bvp, ibi=base_ibi, hr=base_hr)
-        task1_hrv = HRVAnalyzer(bvp=task1_bvp, ibi=task1_ibi, hr=task1_hr)
-        task2_hrv = HRVAnalyzer(bvp=task2_bvp, ibi=task2_ibi, hr=task2_hr)
+        base_hrv = HRVAnalyzer(ibi=base_ibi, hr=base_hr)
+        task1_hrv = HRVAnalyzer(ibi=task1_ibi, hr=task1_hr)
+        task2_hrv = HRVAnalyzer(ibi=task2_ibi, hr=task2_hr)
 
         nnmean = pd.Series([base_hrv.get_nnmean(), task1_hrv.get_nnmean(), task2_hrv.get_nnmean()], index=Conditions,
                            name='NN Mean (ms)')
