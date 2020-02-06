@@ -14,12 +14,18 @@ class HRVAnalyzer:
     _hr = np.empty([1, 0])
     _frequency = np.empty([1, 0])
     _power = np.empty([1, 0])
+    _band_vlf = np.empty([1, 0])
+    _band_lf = np.empty([1, 0])
+    _band_hf = np.empty([1, 0])
 
     def __init__(self, ibi, hr):
         self._ibi = ibi
         self._hr = hr
         self._frequency, self._power = lombscargle.LombScargle(self._ibi[:, 0], self._ibi[:, 1],
                                                                normalization='psd').autopower(method='fast')
+        self._band_vlf = (self._frequency >= self.VLF_MIN) & (self._frequency < self.VLF_MAX)
+        self._band_lf = (self._frequency >= self.LF_MIN) & (self._frequency < self.LF_MAX)
+        self._band_hf = (self._frequency >= self.HF_MIN) & (self._frequency < self.HF_MAX)
 
     def get_nnmean(self):
         return self._ibi[:, 1].mean()
@@ -34,28 +40,22 @@ class HRVAnalyzer:
         return self._hr.std(ddof=1)
 
     def get_vlf(self):
-        band = (self._frequency >= self.VLF_MIN) & (self._frequency < self.VLF_MAX)
-        return self.get_freq(band)
+        return self.get_freq(self._band_vlf)
 
     def get_vlf_peak_freq(self):
-        band = (self._frequency >= self.VLF_MIN) & (self._frequency < self.VLF_MAX)
-        return self.get_peak_freq(band)
+        return self.get_peak_freq(self._band_vlf)
 
     def get_lf(self):
-        band = (self._frequency >= self.LF_MIN) & (self._frequency < self.LF_MAX)
-        return self.get_freq(band)
+        return self.get_freq(self._band_lf)
 
     def get_lf_peak_freq(self):
-        band = (self._frequency >= self.LF_MIN) & (self._frequency < self.LF_MAX)
-        return self.get_peak_freq(band)
+        return self.get_peak_freq(self._band_lf)
 
     def get_hf(self):
-        band = (self._frequency >= self.HF_MIN) & (self._frequency < self.HF_MAX)
-        return self.get_freq(band)
+        return self.get_freq(self._band_hf)
 
     def get_hf_peak_freq(self):
-        band = (self._frequency >= self.HF_MIN) & (self._frequency < self.HF_MAX)
-        return self.get_peak_freq(band)
+        return self.get_peak_freq(self._band_hf)
 
     def get_tf(self):
         band = (self._frequency >= self.VLF_MIN) & (self._frequency < self.HF_MAX)
@@ -78,3 +78,6 @@ class HRVAnalyzer:
     def get_pp_sd2(self):
         tmp = (self._ibi[:-1, 1] + self._ibi[1:, 1]) / np.sqrt(2)
         return tmp.std(ddof=1)
+
+    def get_freq_features(self):
+        return self._frequency, self._power, [self._band_vlf, self._band_lf, self._band_hf]
