@@ -72,3 +72,11 @@ class HRVAnalyzer:
 
     def get_peak_freq(self, band):
         return self._frequency[band][self._power[band].argmax()]
+
+    def get_pp_sd1(self):
+        tmp = (self._ibi[:-1, 1] - self._ibi[1:, 1]) / np.sqrt(2)
+        return tmp.std(ddof=1)
+
+    def get_pp_sd2(self):
+        tmp = (self._ibi[:-1, 1] + self._ibi[1:, 1]) / np.sqrt(2)
+        return tmp.std(ddof=1)
