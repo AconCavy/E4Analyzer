@@ -92,6 +92,14 @@ def main():
         lf_hf = pd.Series([base_lf / base_hf, task1_lf / task1_hf, task2_lf / task2_hf], index=Conditions, name='LF/HF')
         data = data.append(lf_hf)
 
+        sd1 = pd.Series([base_hrv.get_pp_sd1(), task1_hrv.get_pp_sd1(), task2_hrv.get_pp_sd1()], index=Conditions,
+                        name='PP SD1 (ms)')
+        data = data.append(sd1)
+
+        sd2 = pd.Series([base_hrv.get_pp_sd2(), task1_hrv.get_pp_sd2(), task2_hrv.get_pp_sd2()], index=Conditions,
+                        name='PP SD2 (ms)')
+        data = data.append(sd2)
+
         eda = e4.get_eda()
         base_eda = eda[Timer['Start']['Base'] * 4:Timer['End']['Base'] * 4 - 1]
         task1_eda = eda[Timer['Start']['Task 1'] * 4:Timer['End']['Task 1'] * 4 - 1]
