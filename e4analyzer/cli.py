@@ -2,6 +2,7 @@ import glob
 import os
 import zipfile
 import pandas as pd
+import matplotlib.pyplot as plt
 
 from .empatica_e4 import EmpaticaE4
 from .hrv_analyzer import HRVAnalyzer
@@ -19,6 +20,14 @@ def main():
     print(os.getcwd())
     if not os.path.exists(ExportPath):
         os.mkdir(ExportPath)
+
+    export_freq_path = ExportPath + '/freq'
+    if not os.path.exists(export_freq_path):
+        os.mkdir(export_freq_path)
+
+    export_pp_path = ExportPath + '/pp'
+    if not os.path.exists(export_pp_path):
+        os.mkdir(export_pp_path)
 
     paths = [x.replace('\\', '/') for x in glob.glob(ResourcesPath + '/*') if not ('.zip' in x)]
     zips = [x.replace('\\', '/') for x in glob.glob(ResourcesPath + '/*.zip')]
@@ -117,7 +126,56 @@ def main():
         score = pd.Series([base_score, task1_score, task2_score], index=Conditions, name='Score (HR*EDA)')
         data = data.append(score)
 
-        data.to_csv(ExportPath + '/_name.csv'.replace('_name', name), float_format='%.3f')
+        data.to_csv(ExportPath + '/' + name + '.csv', float_format='%.3f')
+
+        fig_freq = plt.figure(figsize=(12, 9))
+        fig_freq.subplots_adjust(hspace=0.6)
+        fig_freq.tight_layout(rect=[0, 0.05, 1, 0.95])
+        fig_freq.suptitle('Lomb-Scargle PSD', fontsize=18)
+        features = [(base_hrv.get_freq_features()), (task1_hrv.get_freq_features()), (task2_hrv.get_freq_features())]
+        for index in range(len(features)):
+            frequency, power, bands = features[index]
+            ax = fig_freq.add_subplot(3, 1, index + 1)
+            ax.set_title(Conditions[index])
+            ax.set_xlabel('$Frequency (Hz)$')
+            ax.set_xlim(0, 0.5)
+            ax.set_ylabel('$PSD (ms^2/Hz)$')
+            ax.set_ylim(0, 60000)
+            ax.plot(frequency, power, linewidth=0.5)
+            ax.fill_between(frequency, power, where=bands[1], facecolor='red', alpha=0.5, label='LF [0.04, 0.15)')
+            ax.fill_between(frequency, power, where=bands[2], facecolor='green', alpha=0.5, label='HF [0.15, 0.40)')
+            ax.legend(loc='upper right')
+        fig_freq.savefig(export_freq_path + '/' + name + '.png')
+        plt.clf()
+
+        fig_pp = plt.figure(figsize=(12, 9))
+        fig_pp.subplots_adjust(wspace=0.4, hspace=0.6)
+        fig_pp.tight_layout(rect=[0, 0.05, 1, 0.95])
+        fig_pp.suptitle('Poincaré Plot', fontsize=18)
+        ibis = [base_ibi, task1_ibi, task2_ibi]
+        for index in range(len(Conditions)):
+            ax = fig_pp.add_subplot(2, 2, index + 1)
+            ax.set_title(Conditions[index])
+            ax.locator_params(axis='x', nbins=4)
+            ax.locator_params(axis='y', nbins=4)
+            ax.set_xlabel('$IBI_k (ms)$')
+            ax.set_ylabel('$IBI_{k+1} (ms)$')
+            ax.set_xlim(500, 1300)
+            ax.set_ylim(500, 1300)
+            ax.scatter(ibis[index][:-1, 1], ibis[index][1:, 1], marker='s', s=10, alpha=0.2)
+        ax = fig_pp.add_subplot(2, 2, 4)
+        ax.set_title('Overlap')
+        ax.locator_params(axis='x', nbins=4)
+        ax.locator_params(axis='y', nbins=4)
+        ax.set_xlabel('$IBI_k (ms)$')
+        ax.set_ylabel('$IBI_{k+1} (ms)$')
+        ax.set_xlim(500, 1300)
+        ax.set_ylim(500, 1300)
+        ax.scatter(ibis[0][:-1, 1], ibis[0][1:, 1], marker='s', s=10, alpha=0.2, c='red', label='Base')
+        ax.scatter(ibis[1][:-1, 1], ibis[1][1:, 1], marker='s', s=10, alpha=0.2, c='green', label='Task 1')
+        ax.scatter(ibis[2][:-1, 1], ibis[2][1:, 1], marker='s', s=10, alpha=0.2, c='blue', label='Task 2')
+        ax.legend(loc='upper right')
+        fig_pp.savefig(export_pp_path + '/' + name + '.png')
 
 
 def extract_zip(path):
